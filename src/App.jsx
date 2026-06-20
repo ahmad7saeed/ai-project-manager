@@ -120,7 +120,7 @@ export default function App() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${process.env.REACT_APP_GROQ_API_KEY}`
+          "Authorization": `Bearer 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`
         },
         body: JSON.stringify({
           model: "llama3-70b-8192",
