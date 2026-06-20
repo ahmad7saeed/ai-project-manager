@@ -114,20 +114,25 @@ export default function App() {
     if (!input.trim() || loading) return;
     setLoading(true); setPhase("planning");
     setProject(null); setTasks([]); setLog([]);
-    addLog("📋 Sending project to Claude PM...", "#7c6af7");
+    addLog("📋 Sending project to Groq PM...", "#7c6af7");
     try {
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
+      const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${process.env.REACT_APP_GROQ_API_KEY}`
+        },
         body: JSON.stringify({
-          model: "claude-sonnet-4-20250514",
+          model: "llama3-70b-8192",
           max_tokens: 1000,
-          system: STEPS_PROMPT,
-          messages: [{ role: "user", content: `Project goal: ${input}` }],
+          messages: [
+            { role: "system", content: STEPS_PROMPT },
+            { role: "user", content: `Project goal: ${input}` }
+          ],
         }),
       });
       const data = await res.json();
-      const text = data.content?.map(b => b.text || "").join("") || "";
+      const text = data.choices[0]?.message?.content || "";
       const clean = text.replace(/```json|```/g, "").trim();
       const parsed = JSON.parse(clean);
       setProject(parsed); setTasks(parsed.tasks);
@@ -193,7 +198,7 @@ export default function App() {
           <div style={{ width: 36, height: 36, borderRadius: 10, background: "linear-gradient(135deg, #7c6af7, #c46af7)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>⚡</div>
           <div>
             <div style={{ fontWeight: 800, fontSize: 17 }}>AI Project Manager</div>
-            <div style={{ color: "#555", fontSize: 12 }}>Powered by Claude</div>
+            <div style={{ color: "#555", fontSize: 12 }}>Powered by Groq</div>
           </div>
           {phase === "done" && (
             <div style={{ marginLeft: "auto", background: "#4caf8222", color: "#4caf82", borderRadius: 20, padding: "4px 12px", fontSize: 12, fontWeight: 600 }}>✓ Complete</div>
@@ -262,7 +267,7 @@ export default function App() {
             <div style={{ fontSize: 48 }}>⚡</div>
             <div style={{ fontSize: 15, fontWeight: 600, color: "#444" }}>Describe any project above</div>
             <div style={{ fontSize: 13, textAlign: "center", maxWidth: 260, lineHeight: 1.6, color: "#333" }}>
-              Claude will break it into tasks, assign AI agents, and execute — pausing only when your input is needed.
+              Groq will break it into tasks, assign AI agents, and execute — pausing only when your input is needed.
             </div>
           </div>
         )}
