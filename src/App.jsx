@@ -116,23 +116,13 @@ export default function App() {
     setProject(null); setTasks([]); setLog([]);
     addLog("📋 Sending project to Groq PM...", "#7c6af7");
     try {
-      const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer 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`
-        },
-        body: JSON.stringify({
-          model: "llama3-70b-8192",
-          max_tokens: 1000,
-          messages: [
-            { role: "system", content: STEPS_PROMPT },
-            { role: "user", content: `Project goal: ${input}` }
-          ],
-        }),
-      });
-      const data = await res.json();
-      const text = data.choices[0]?.message?.content || "";
+      const res = await fetch("/api/plan", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ goal: input, system: STEPS_PROMPT }),
+});
+const data = await res.json();
+const text = data.choices[0]?.message?.content || "";
       const clean = text.replace(/```json|```/g, "").trim();
       const parsed = JSON.parse(clean);
       setProject(parsed); setTasks(parsed.tasks);
