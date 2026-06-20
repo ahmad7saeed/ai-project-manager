@@ -122,6 +122,7 @@ export default function App() {
   body: JSON.stringify({ goal: input, system: STEPS_PROMPT }),
 });
 const data = await res.json();
+console.log("Groq response:", JSON.stringify(data));
 const text = data.choices[0]?.message?.content || "";
       const clean = text.replace(/```json|```/g, "").trim();
       const parsed = JSON.parse(clean);
